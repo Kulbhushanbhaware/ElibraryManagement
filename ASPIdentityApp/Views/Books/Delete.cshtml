@@ -1,0 +1,85 @@
+﻿@using ASPIdentityApp.Areas.Identity.Data
+@using Microsoft.EntityFrameworkCore
+@model ASPIdentityApp.Models.Book
+@{
+    ViewData["Title"] = "Delete Book";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4><i class="fas fa-exclamation-triangle me-2"></i>Delete Book</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="text-danger">Are you sure you want to delete this book?</h5>
+                    <div class="alert alert-warning">
+                        <strong>Warning:</strong> This action cannot be undone.
+                        @{
+                            var issueCount = await GetIssueCount(Model.Id);
+                        }
+                        @if (issueCount > 0)
+                        {
+                            <span>This book is currently issued to @issueCount member(s). Deleting the book may cause data inconsistency.</span>
+                        }
+                    </div>
+
+                    <dl class="row">
+                        <dt class="col-sm-3">Title:</dt>
+                        <dd class="col-sm-9">@Model.Title</dd>
+
+                        <dt class="col-sm-3">ISBN:</dt>
+                        <dd class="col-sm-9">@Model.ISBN</dd>
+
+                        <dt class="col-sm-3">Author:</dt>
+                        <dd class="col-sm-9">@Model.Author.FullName</dd>
+
+                        <dt class="col-sm-3">Publisher:</dt>
+                        <dd class="col-sm-9">@Model.Publisher.Name</dd>
+
+                        <dt class="col-sm-3">Total Copies:</dt>
+                        <dd class="col-sm-9">@Model.TotalCopies</dd>
+
+                        <dt class="col-sm-3">Available Copies:</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge @(Model.AvailableCopies > 0 ? "bg-success" : "bg-danger")">
+                                @Model.AvailableCopies
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-3">Genre:</dt>
+                        <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Genre) ? "Not specified" : Model.Genre)</dd>
+                    </dl>
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <dt class="col-sm-3">Description:</dt>
+                        <dd class="col-sm-9">@Model.Description</dd>
+                    }
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>Delete
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private async Task<int> GetIssueCount(int bookId)
+    {
+        var context = new ApplicationDbContext(new Microsoft.EntityFrameworkCore.DbContextOptions<ApplicationDbContext>());
+        return await context.BookIssues
+            .CountAsync(bi => bi.BookId == bookId && bi.Status == "Issued");
+    }
+}

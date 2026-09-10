@@ -1,0 +1,210 @@
+﻿@model ASPIdentityApp.Models.Member
+@{
+    ViewData["Title"] = "Add New Member";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-user-plus me-2"></i>Add New Member</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="MemberCode" class="control-label">Member Code *</label>
+                                    <input asp-for="MemberCode" class="form-control" placeholder="e.g., MEM001" />
+                                    <span asp-validation-for="MemberCode" class="text-danger"></span>
+                                    <small class="form-text text-muted">Unique identifier for the member (e.g., MEM001, MEM002)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Status" class="control-label">Status *</label>
+                                    <select asp-for="Status" class="form-control">
+                                        <option value="">-- Select Status --</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                        <option value="Suspended">Suspended</option>
+                                    </select>
+                                    <span asp-validation-for="Status" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="FirstName" class="control-label">First Name *</label>
+                                    <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
+                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="LastName" class="control-label">Last Name *</label>
+                                    <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
+                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Email" class="control-label">Email *</label>
+                                    <input asp-for="Email" class="form-control" type="email" placeholder="Enter email address" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="PhoneNumber" class="control-label">Phone Number</label>
+                                    <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Address" class="control-label">Address</label>
+                            <textarea asp-for="Address" class="form-control" rows="3" placeholder="Enter full address"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="MembershipExpiry" class="control-label">Membership Expiry *</label>
+                                    <input asp-for="MembershipExpiry" class="form-control" type="date" />
+                                    <span asp-validation-for="MembershipExpiry" class="text-danger"></span>
+                                    <small class="form-text text-muted">Membership is valid for 1 year by default</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="TotalFees" class="control-label">Total Fees ($)</label>
+                                    <input asp-for="TotalFees" class="form-control" type="number" step="0.01" min="0" value="0" />
+                                    <span asp-validation-for="TotalFees" class="text-danger"></span>
+                                    <small class="form-text text-muted">Enter any membership fees paid</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Membership Information</h6>
+                            <ul class="mb-0">
+                                <li>Registration date will be automatically set to today</li>
+                                <li>Member code must be unique across all members</li>
+                                <li>Email address must be unique across all members</li>
+                                <li>Default membership duration is 1 year</li>
+                                <li>Active status allows book borrowing</li>
+                            </ul>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Create Member
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Set default expiry date to 1 year from now
+        document.addEventListener('DOMContentLoaded', function() {
+            const expiryDateInput = document.getElementById('MembershipExpiry');
+            if (expiryDateInput && !expiryDateInput.value) {
+                const oneYearFromNow = new Date();
+                oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+                const formattedDate = oneYearFromNow.toISOString().split('T')[0];
+                expiryDateInput.value = formattedDate;
+            }
+
+            // Auto-generate member code if empty
+            const memberCodeInput = document.getElementById('MemberCode');
+            if (memberCodeInput && !memberCodeInput.value) {
+                memberCodeInput.value = 'MEM';
+            }
+
+            // Validate email format
+            const emailInput = document.getElementById('Email');
+            if (emailInput) {
+                emailInput.addEventListener('blur', function() {
+                    const email = this.value;
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (email && !emailRegex.test(email)) {
+                        this.setCustomValidity('Please enter a valid email address');
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                });
+            }
+
+            // Set minimum date for membership expiry to today
+            if (expiryDateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                expiryDateInput.min = today;
+            }
+        });
+
+        // Real-time validation for member code
+        document.getElementById('MemberCode')?.addEventListener('input', function() {
+            const value = this.value;
+            if (value && !/^[A-Za-z0-9]+$/.test(value)) {
+                this.setCustomValidity('Member code can only contain letters and numbers');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+} *@
+
+<style>
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-text {
+        font-size: 0.875em;
+    }
+    
+    .btn {
+        margin-right: 0.5rem;
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+    }
+    
+    .alert ul {
+        margin-bottom: 0;
+    }
+    
+    .alert li {
+        margin-bottom: 0.25rem;
+    }
+</style>

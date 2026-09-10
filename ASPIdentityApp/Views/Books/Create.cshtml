@@ -1,0 +1,104 @@
+﻿@model ASPIdentityApp.Models.Book
+@{
+    ViewData["Title"] = "Add New Book";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-plus me-2"></i>Add New Book</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" id="bookForm">
+                        <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Title" class="control-label">Title *</label>
+                                    <input asp-for="Title" class="form-control" name="Title" />
+                                    <span asp-validation-for="Title" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="ISBN" class="control-label">ISBN *</label>
+                                    <input asp-for="ISBN" class="form-control" name="ISBN" />
+                                    <span asp-validation-for="ISBN" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="AuthorId" class="control-label">Author *</label>
+                                    <select asp-for="AuthorId" class="form-control" asp-items="ViewBag.Authors" name="AuthorId">
+                                        <option value="">-- Select Author --</option>
+                                    </select>
+                                    <span asp-validation-for="AuthorId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="PublisherId" class="control-label">Publisher *</label>
+                                    <select asp-for="PublisherId" class="form-control" asp-items="ViewBag.Publishers" name="PublisherId">
+                                        <option value="">-- Select Publisher --</option>
+                                    </select>
+                                    <span asp-validation-for="PublisherId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="PublishedDate" class="control-label">Published Date *</label>
+                                    <input asp-for="PublishedDate" class="form-control" type="date" name="PublishedDate" />
+                                    <span asp-validation-for="PublishedDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="TotalCopies" class="control-label">Total Copies *</label>
+                                    <input asp-for="TotalCopies" class="form-control" min="1" name="TotalCopies" />
+                                    <span asp-validation-for="TotalCopies" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Genre" class="control-label">Genre</label>
+                                    <input asp-for="Genre" class="form-control" name="Genre" />
+                                    <span asp-validation-for="Genre" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Description" class="control-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="4" name="Description"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mt-5 pt-3 border-top">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Create Book
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

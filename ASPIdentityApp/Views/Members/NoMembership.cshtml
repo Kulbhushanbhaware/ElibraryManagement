@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "No Membership";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h1><i class="fas fa-exclamation-triangle me-2"></i>No Membership Found</h1>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-id-card fa-5x text-muted mb-4"></i>
+                    <h3>Library Membership Required</h3>
+                    <p class="lead">You don't have an active library membership.</p>
+                    <p class="text-muted">
+                        To access library services and borrow books, you need to have an active membership.
+                        Please contact the library administration to register for membership.
+                    </p>
+
+                    <div class="mt-4">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary me-2">
+                            <i class="fas fa-home me-1"></i>Back to Home
+                        </a>
+                        <a asp-controller="Books" asp-action="Index" class="btn btn-outline-primary">
+                            <i class="fas fa-book me-1"></i>Browse Books
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

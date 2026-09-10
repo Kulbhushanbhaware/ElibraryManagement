@@ -1,0 +1,510 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - E-Library Management System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Simple Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Make body and html take full height - CRITICAL FOR STICKY FOOTER */
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+            .navbar-brand i {
+                margin-right: 10px;
+                font-size: 1.8rem;
+                transition: transform 0.3s ease;
+            }
+
+            .navbar-brand:hover i {
+                transform: rotate(15deg);
+            }
+
+        .nav-link {
+            color: #ecf0f1 !important;
+            font-weight: 500;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            padding: 8px 15px !important;
+            display: flex;
+            align-items: center;
+        }
+
+            .nav-link i {
+                margin-right: 8px;
+                font-size: 1.1rem;
+            }
+
+            .nav-link:hover,
+            .nav-link.active {
+                color: white !important;
+                background: rgba(255,255,255,0.2);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+
+        .dropdown-menu {
+            background: white;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 10px 0;
+            margin-top: 8px;
+        }
+
+        .dropdown-item {
+            padding: 10px 20px;
+            color: #2c3e50;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+            .dropdown-item:hover {
+                background: #3498db;
+                color: white;
+                transform: translateX(5px);
+            }
+
+            .dropdown-item i {
+                margin-right: 10px;
+                width: 20px;
+                text-align: center;
+            }
+
+        /* Main Content - This will grow to fill space */
+        main {
+            flex: 1 0 auto;
+            padding: 2rem 0;
+            width: 100%;
+        }
+
+        .container-fluid {
+            padding: 0 15px;
+        }
+
+        /* Footer - Fixed to bottom */
+        footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            flex-shrink: 0;
+            width: 100%;
+            margin-top: auto;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+        }
+
+        .footer-top {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-bottom {
+            background: rgba(0,0,0,0.1);
+            padding: 0.8rem 0;
+        }
+
+        .footer-link {
+            color: #bdc3c7;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .footer-link i {
+                margin-right: 5px;
+            }
+
+            .footer-link:hover {
+                color: #3498db;
+                background: rgba(255,255,255,0.1);
+                text-decoration: none;
+                transform: translateY(-2px);
+            }
+
+        .copyright {
+            color: #95a5a6;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Login Partial Styling */
+        .navbar-nav .nav-item.dropdown .nav-link {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 8px 15px;
+        }
+
+        /* Stats Cards for Home Page */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            }
+
+            .stat-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 5px;
+            }
+
+            .stat-card:nth-child(1)::before {
+                background: linear-gradient(90deg, #3498db, #2980b9);
+            }
+
+            .stat-card:nth-child(2)::before {
+                background: linear-gradient(90deg, #e74c3c, #c0392b);
+            }
+
+            .stat-card:nth-child(3)::before {
+                background: linear-gradient(90deg, #2ecc71, #27ae60);
+            }
+
+            .stat-card:nth-child(4)::before {
+                background: linear-gradient(90deg, #f39c12, #d35400);
+            }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background: linear-gradient(135deg, #f39c12, #d35400);
+        }
+
+        .stat-title {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+            .stat-change.positive {
+                color: #27ae60;
+            }
+
+            .stat-change.negative {
+                color: #e74c3c;
+            }
+
+            .stat-change i {
+                margin-right: 5px;
+            }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .container-fluid {
+                padding: 0 10px;
+            }
+
+            .navbar-nav {
+                text-align: center;
+                margin-top: 1rem;
+            }
+
+            .nav-link {
+                margin: 2px 0;
+                display: flex;
+                justify-content: center;
+            }
+
+            .footer-top {
+                padding: 0.8rem 0;
+            }
+
+            .footer-bottom {
+                padding: 0.6rem 0;
+            }
+
+            .footer-link {
+                display: inline-block;
+                margin: 3px 5px;
+                font-size: 0.85rem;
+            }
+
+            main {
+                padding: 1.5rem 0;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .footer-link {
+                display: block;
+                margin: 5px 0;
+                text-align: center;
+            }
+
+            .copyright {
+                font-size: 0.8rem;
+            }
+
+            main {
+                padding: 1rem 0;
+            }
+
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-book-open"></i>
+                    E-Library
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Home
+                            </a>
+                        </li>
+
+                        <!-- Member Navigation Items (Visible to all authenticated users) -->
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Books" asp-action="Browse">
+                                    <i class="fas fa-search"></i> Browse Books
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="BookIssues" asp-action="MyIssues">
+                                    <i class="fas fa-book"></i> My Books
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Members" asp-action="MyMembership">
+                                    <i class="fas fa-id-card"></i> My Membership
+                                </a>
+                            </li>
+                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="AboutUs">
+                                <i class="fas fa-info-circle"></i> About
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Privacy">
+                                <i class="fas fa-shield-alt"></i> Privacy
+                            </a>
+                        </li>
+
+                        <!-- Admin/Librarian Management Menu -->
+                        @if (User.IsInRole("Admin") || User.IsInRole("Librarian"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                    <i class="fas fa-cogs"></i> Management
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Books" asp-action="Index"><i class="fas fa-book me-2"></i>Books</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Authors" asp-action="Index"><i class="fas fa-user-edit me-2"></i>Authors</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Publishers" asp-action="Index"><i class="fas fa-building me-2"></i>Publishers</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Members" asp-action="Index"><i class="fas fa-users me-2"></i>Members</a></li>
+                                    <li><a class="dropdown-item" asp-controller="BookIssues" asp-action="Index"><i class="fas fa-share-square me-2"></i>Book Issues</a></li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main role="main">
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Footer - Will stick to bottom -->
+    <footer>
+        <div class="footer-top">
+            <div class="container-fluid">
+                <div class="text-center">
+                    <a asp-controller="Books" asp-action="Index" class="footer-link"><i class="fas fa-book"></i> Book Inventory</a>
+                    <a asp-controller="Authors" asp-action="Index" class="footer-link"><i class="fas fa-user-edit"></i> Author Management</a>
+                    <a asp-controller="Publishers" asp-action="Index" class="footer-link"><i class="fas fa-building"></i> Publisher Management</a>
+                    <a asp-controller="BookIssues" asp-action="Index" class="footer-link"><i class="fas fa-share-square"></i> Book Issuing</a>
+                    <a asp-controller="Members" asp-action="Index" class="footer-link"><i class="fas fa-users"></i> Member Management</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container-fluid">
+                <div class="text-center">
+                    <p class="copyright">
+                        &copy; 2025 - E-Library Management System -
+                        <a asp-controller="Home" asp-action="Privacy" class="footer-link"><i class="fas fa-shield-alt"></i> Privacy</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Add active class to current page
+            var currentUrl = window.location.pathname;
+            $('.nav-link').each(function() {
+                var linkUrl = $(this).attr('href');
+                if (currentUrl === linkUrl) {
+                    $(this).addClass('active');
+                }
+            });
+
+            // Add active class to dropdown items
+            $('.dropdown-item').each(function() {
+                var linkUrl = $(this).attr('href');
+                if (currentUrl === linkUrl) {
+                    $(this).closest('.dropdown').find('.nav-link').addClass('active');
+                }
+            });
+
+            // Stats update simulation for Home page
+            function updateStatistics() {
+                // Only run if we're on the home page and stats containers exist
+                if ($('.stats-container').length > 0) {
+                    // Simulate dynamic data updates
+                    const books = Math.floor(Math.random() * 5000) + 10000;
+                    const authors = Math.floor(Math.random() * 1000) + 2500;
+                    const members = Math.floor(Math.random() * 2000) + 7000;
+                    const issued = Math.floor(Math.random() * 500) + 1000;
+
+                    // Update the DOM with new values
+                    $('#total-books').text(books.toLocaleString());
+                    $('#total-authors').text(authors.toLocaleString());
+                    $('#total-members').text(members.toLocaleString());
+                    $('#books-issued').text(issued.toLocaleString());
+                }
+            }
+
+            // Update statistics every 5 seconds to simulate dynamic data
+            setInterval(updateStatistics, 5000);
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

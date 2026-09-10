@@ -1,0 +1,152 @@
+﻿@model ASPIdentityApp.Models.Member
+@{
+    ViewData["Title"] = "My Membership";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h1><i class="fas fa-id-card me-2"></i>My Membership</h1>
+                </div>
+                <div class="card-body">
+                    @if (Model != null)
+                    {
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="mb-0">Member Information</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl class="row">
+                                            <dt class="col-sm-5">Member Code:</dt>
+                                            <dd class="col-sm-7"><strong>@Model.MemberCode</strong></dd>
+
+                                            <dt class="col-sm-5">First Name:</dt>
+                                            <dd class="col-sm-7">@Model.FirstName</dd>
+
+                                            <dt class="col-sm-5">Last Name:</dt>
+                                            <dd class="col-sm-7">@Model.LastName</dd>
+
+                                            <dt class="col-sm-5">Email:</dt>
+                                            <dd class="col-sm-7">@Model.Email</dd>
+
+                                            <dt class="col-sm-5">Phone:</dt>
+                                            <dd class="col-sm-7">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</dd>
+
+                                            <dt class="col-sm-5">Address:</dt>
+                                            <dd class="col-sm-7">@(string.IsNullOrEmpty(Model.Address) ? "Not provided" : Model.Address)</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header bg-info text-white">
+                                        <h5 class="mb-0">Membership Details</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl class="row">
+                                            <dt class="col-sm-5">Registration Date:</dt>
+                                            <dd class="col-sm-7">@Model.RegistrationDate.ToString("MMM dd, yyyy")</dd>
+
+                                            <dt class="col-sm-5">Membership Expiry:</dt>
+                                            <dd class="col-sm-7">
+                                                <span class="badge @(Model.MembershipExpiry >= DateTime.Now ? "bg-success" : "bg-danger")">
+                                                    @Model.MembershipExpiry.ToString("MMM dd, yyyy")
+                                                </span>
+                                            </dd>
+
+                                            <dt class="col-sm-5">Status:</dt>
+                                            <dd class="col-sm-7">
+                                                <span class="badge @(Model.Status == "Active" ? "bg-success" : Model.Status == "Inactive" ? "bg-secondary" : Model.Status == "Suspended" ? "bg-danger" : "bg-warning")">
+                                                    @Model.Status
+                                                </span>
+                                            </dd>
+
+                                            <dt class="col-sm-5">Total Fees:</dt>
+                                            <dd class="col-sm-7">$@Model.TotalFees.ToString("F2")</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert @(Model.Status == "Suspended" ? "alert-danger" : Model.Status == "Inactive" ? "alert-warning" : Model.MembershipExpiry < DateTime.Now ? "alert-danger" : "alert-info")">
+                            <h6><i class="fas fa-info-circle me-2"></i>Membership Information</h6>
+                            <p class="mb-0">
+                                @if (Model.Status == "Active")
+                                {
+                                    if (Model.MembershipExpiry < DateTime.Now)
+                                    {
+                                        <strong class="text-danger">Your membership has expired. Please renew to continue using library services.</strong>
+                                    }
+                                    else
+                                    {
+                                        var daysRemaining = (Model.MembershipExpiry - DateTime.Now).Days;
+                                        <span>Your membership is <strong>active</strong> and expires in <strong>@daysRemaining days</strong>.</span>
+                                    }
+                                }
+                                else if (Model.Status == "Inactive")
+                                {
+                                    <strong class="text-warning">Your membership is inactive. Please contact the library to activate it.</strong>
+                                }
+                                else if (Model.Status == "Suspended")
+                                {
+                                    <strong class="text-danger">Your membership is suspended. Please contact the library administrator.</strong>
+                                }
+                            </p>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a asp-controller="BookIssues" asp-action="MyIssues" class="btn btn-primary me-2">
+                                <i class="fas fa-book me-1"></i>View My Issued Books
+                            </a>
+                            <a asp-controller="Books" asp-action="Index" class="btn btn-outline-primary">
+                                <i class="fas fa-search me-1"></i>Browse Books
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-id-card fa-4x text-muted mb-3"></i>
+                            <h3>No Membership Found</h3>
+                            <p class="text-muted">You don't have an active library membership yet.</p>
+                            <p>Please contact the library administrator to register for membership.</p>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                                <i class="fas fa-home me-1"></i>Back to Home
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-header {
+        border-bottom: none;
+    }
+
+    .badge {
+        font-size: 0.75em;
+        padding: 0.4em 0.6em;
+    }
+
+    dl.row dt {
+        font-weight: 600;
+    }
+
+    dl.row dd {
+        margin-bottom: 0.5rem;
+    }
+
+    .table th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
+</style>

@@ -1,0 +1,332 @@
+﻿@using Microsoft.EntityFrameworkCore
+@model ASPIdentityApp.Models.Member
+@inject ASPIdentityApp.Areas.Identity.Data.ApplicationDbContext _context
+@{
+    ViewData["Title"] = "Member Details";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-user me-2"></i>Member Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Member Information</h5>
+                            <dl class="row">
+                                <dt class="col-sm-4">Member Code:</dt>
+                                <dd class="col-sm-8"><strong>@Model.MemberCode</strong></dd>
+
+                                <dt class="col-sm-4">First Name:</dt>
+                                <dd class="col-sm-8">@Model.FirstName</dd>
+
+                                <dt class="col-sm-4">Last Name:</dt>
+                                <dd class="col-sm-8">@Model.LastName</dd>
+
+                                <dt class="col-sm-4">Email:</dt>
+                                <dd class="col-sm-8">@Model.Email</dd>
+
+                                <dt class="col-sm-4">Phone:</dt>
+                                <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</dd>
+
+                                <dt class="col-sm-4">Address:</dt>
+                                <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Address) ? "Not provided" : Model.Address)</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Membership Details</h5>
+                            <dl class="row">
+                                <dt class="col-sm-4">Registration Date:</dt>
+                                <dd class="col-sm-8">@Model.RegistrationDate.ToString("MMM dd, yyyy")</dd>
+
+                                <dt class="col-sm-4">Membership Expiry:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge @(Model.MembershipExpiry >= DateTime.Now ? "bg-success" : "bg-danger")">
+                                        @Model.MembershipExpiry.ToString("MMM dd, yyyy")
+                                        @if (Model.MembershipExpiry < DateTime.Now)
+                                        {
+                                            <br />
+                                        
+                                            <small>Expired</small>
+                                        }
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-4">Status:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge @(Model.Status == "Active" ? "bg-success" : Model.Status == "Inactive" ? "bg-secondary" : "bg-warning")">
+                                        @Model.Status
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-4">Total Fees:</dt>
+                                <dd class="col-sm-8">$@Model.TotalFees.ToString("F2")</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Current Issues Section -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5>
+                                <i class="fas fa-book me-1"></i>Currently Issued Books
+                                @{
+                                    var currentIssues = await GetCurrentIssues(Model.Id);
+                                    var overdueCount = currentIssues.Count(i => i.DueDate < DateTime.Now);
+                                }
+                                @if (currentIssues.Any())
+                                {
+                                    <span class="badge bg-primary">@currentIssues.Count</span>
+                                    @if (overdueCount > 0)
+                                    {
+                                        <span class="badge bg-danger ms-1">@overdueCount Overdue</span>
+                                    }
+                                }
+                            </h5>
+
+                            @if (currentIssues.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Book Title</th>
+                                                <th>Author</th>
+                                                <th>Issue Date</th>
+                                                <th>Due Date</th>
+                                                <th>Days Overdue</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var issue in currentIssues)
+                                            {
+                                                var overdueDays = issue.DueDate < DateTime.Now ? (DateTime.Now - issue.DueDate).Days : 0;
+                                                <tr>
+                                                    <td>
+                                                        @if (issue.Book != null)
+                                                        {
+                                                            @issue.Book.Title
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">Book not found</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (issue.Book?.Author != null)
+                                                        {
+                                                            @issue.Book.Author.FirstName @issue.Book.Author.LastName
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">Author not found</span>
+                                                        }
+                                                    </td>
+                                                    <td>@issue.IssueDate.ToString("MMM dd, yyyy")</td>
+                                                    <td class="@(overdueDays > 0 ? "text-danger fw-bold" : "")">
+                                                        @issue.DueDate.ToString("MMM dd, yyyy")
+                                                    </td>
+                                                    <td class="@(overdueDays > 0 ? "text-danger fw-bold" : "")">
+                                                        @if (overdueDays > 0)
+                                                        {
+                                                            <span>@overdueDays days</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">0 days</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge @(issue.Status == "Issued" ? "bg-warning" : "bg-danger")">
+                                                            @issue.Status
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-3">
+                                    <i class="fas fa-book-open fa-2x text-muted mb-2"></i>
+                                    <p class="text-muted mb-0">No books currently issued to this member.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Issue History Section -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-history me-1"></i>Issue History</h5>
+                            @{
+                                var allIssues = await GetAllIssues(Model.Id);
+                            }
+                            @if (allIssues.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Book Title</th>
+                                                <th>Issue Date</th>
+                                                <th>Due Date</th>
+                                                <th>Return Date</th>
+                                                <th>Status</th>
+                                                <th>Fine</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var issue in allIssues.Take(10))
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @if (issue.Book != null)
+                                                        {
+                                                            @issue.Book.Title
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">Book not found</span>
+                                                        }
+                                                    </td>
+                                                    <td>@issue.IssueDate.ToString("MMM dd, yyyy")</td>
+                                                    <td>@issue.DueDate.ToString("MMM dd, yyyy")</td>
+                                                    <td>
+                                                        @if (issue.ReturnDate.HasValue)
+                                                        {
+                                                            @issue.ReturnDate.Value.ToString("MMM dd, yyyy")
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">Not returned</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge @GetStatusBadgeClass(issue.Status)">
+                                                            @issue.Status
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        @if (issue.FineAmount > 0)
+                                                        {
+                                                            <span class="text-danger fw-bold">$@issue.FineAmount.ToString("F2")</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">$0.00</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                    @if (allIssues.Count > 10)
+                                    {
+                                        <div class="text-center mt-2">
+                                            <small class="text-muted">Showing last 10 of @allIssues.Count total issues</small>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted">No issue history found for this member.</p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        @if (User.IsInRole("Admin") || User.IsInRole("Librarian"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">
+                                <i class="fas fa-edit me-1"></i>Edit
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger me-2">
+                                <i class="fas fa-trash me-1"></i>Delete
+                            </a>
+                        }
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private async Task<List<BookIssue>> GetCurrentIssues(int memberId)
+    {
+        return await _context.BookIssues
+            .Where(bi => bi.MemberId == memberId && bi.Status == "Issued")
+            .Include(bi => bi.Book)
+                .ThenInclude(b => b.Author)
+            .OrderByDescending(bi => bi.IssueDate)
+            .ToListAsync();
+    }
+
+    private async Task<List<BookIssue>> GetAllIssues(int memberId)
+    {
+        return await _context.BookIssues
+            .Where(bi => bi.MemberId == memberId)
+            .Include(bi => bi.Book)
+            .OrderByDescending(bi => bi.IssueDate)
+            .ToListAsync();
+    }
+
+    private string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Issued" => "bg-warning",
+            "Returned" => "bg-success",
+            "Overdue" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        // You can add any JavaScript here if needed
+        console.log('Member details page loaded');
+    </script>
+}
+
+<style>
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .badge {
+        font-size: 0.75em;
+        padding: 0.4em 0.6em;
+    }
+
+    dl.row dt {
+        font-weight: 600;
+    }
+
+    dl.row dd {
+        margin-bottom: 0.5rem;
+    }
+
+    .table th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
+
+    .text-center.py-3 {
+        background-color: #f8f9fa;
+        border-radius: 0.375rem;
+    }
+</style>

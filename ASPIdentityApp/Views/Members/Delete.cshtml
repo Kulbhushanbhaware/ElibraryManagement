@@ -1,0 +1,255 @@
+﻿@using ASPIdentityApp.Areas.Identity.Data
+@using Microsoft.EntityFrameworkCore
+@model ASPIdentityApp.Models.Member
+@inject ApplicationDbContext _context
+@{
+    ViewData["Title"] = "Delete Member";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4><i class="fas fa-exclamation-triangle me-2"></i>Delete Member</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="text-danger">Are you sure you want to delete this member?</h5>
+                    <div class="alert alert-warning">
+                        <strong>Warning:</strong> This action cannot be undone.
+                        @{
+                            var issueCount = await GetIssueCount(Model.Id);
+                            var totalIssues = await GetTotalIssueCount(Model.Id);
+                        }
+                        @if (issueCount > 0)
+                        {
+                            <span class="d-block mt-1">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                This member has <strong>@issueCount</strong> currently issued book(s).
+                                You must return all books before deleting the member.
+                            </span>
+                        }
+                        @if (totalIssues > 0)
+                        {
+                            <span class="d-block mt-1">
+                                <i class="fas fa-history me-1"></i>
+                                This member has a total of <strong>@totalIssues</strong> book issue record(s) in history.
+                                These records will be permanently deleted.
+                            </span>
+                        }
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Member Information</h5>
+                            <dl class="row">
+                                <dt class="col-sm-4">Member Code:</dt>
+                                <dd class="col-sm-8">@Model.MemberCode</dd>
+
+                                <dt class="col-sm-4">First Name:</dt>
+                                <dd class="col-sm-8">@Model.FirstName</dd>
+
+                                <dt class="col-sm-4">Last Name:</dt>
+                                <dd class="col-sm-8">@Model.LastName</dd>
+
+                                <dt class="col-sm-4">Email:</dt>
+                                <dd class="col-sm-8">@Model.Email</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Membership Details</h5>
+                            <dl class="row">
+                                <dt class="col-sm-4">Status:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge @(Model.Status == "Active" ? "bg-success" : Model.Status == "Inactive" ? "bg-secondary" : "bg-warning")">
+                                        @Model.Status
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-4">Registration Date:</dt>
+                                <dd class="col-sm-8">@Model.RegistrationDate.ToString("MMM dd, yyyy")</dd>
+
+                                <dt class="col-sm-4">Membership Expiry:</dt>
+                                <dd class="col-sm-9">@Model.MembershipExpiry.ToString("MMM dd, yyyy")</dd>
+
+                                <dt class="col-sm-4">Total Fees:</dt>
+                                <dd class="col-sm-8">$@Model.TotalFees.ToString("F2")</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Current Issues Section -->
+                    @{
+                        var currentIssues = await GetCurrentIssues(Model.Id);
+                    }
+                    @if (currentIssues.Any())
+                    {
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h5 class="text-danger">
+                                    <i class="fas fa-book me-1"></i>Currently Issued Books (@currentIssues.Count)
+                                </h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Book Title</th>
+                                                <th>Author</th>
+                                                <th>Issue Date</th>
+                                                <th>Due Date</th>
+                                                <th>Days Overdue</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var issue in currentIssues)
+                                            {
+                                                var overdueDays = issue.DueDate < DateTime.Now ? (DateTime.Now - issue.DueDate).Days : 0;
+                                                <tr>
+                                                    <td>
+                                                        @if (issue.Book != null)
+                                                        {
+                                                            @issue.Book.Title
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">Book not found</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (issue.Book?.Author != null)
+                                                        {
+                                                            @issue.Book.Author.FirstName @issue.Book.Author.LastName
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">Author not found</span>
+                                                        }
+                                                    </td>
+                                                    <td>@issue.IssueDate.ToString("MMM dd, yyyy")</td>
+                                                    <td class="@(overdueDays > 0 ? "text-danger fw-bold" : "")">
+                                                        @issue.DueDate.ToString("MMM dd, yyyy")
+                                                    </td>
+                                                    <td class="@(overdueDays > 0 ? "text-danger fw-bold" : "")">
+                                                        @if (overdueDays > 0)
+                                                        {
+                                                            <span>@overdueDays days</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">0 days</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="alert alert-danger mt-2">
+                                    <i class="fas fa-ban me-1"></i>
+                                    <strong>Cannot delete:</strong> Please return all issued books before deleting this member.
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="form-group mt-4">
+                            @if (currentIssues.Any())
+                            {
+                                <button type="button" class="btn btn-danger" disabled title="Return all books first">
+                                    <i class="fas fa-trash me-1"></i>Delete (Disabled - Books Issued)
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you absolutely sure you want to delete this member? This action cannot be undone.')">
+                                    <i class="fas fa-trash me-1"></i>Delete Member
+                                </button>
+                            }
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private async Task<int> GetIssueCount(int memberId)
+    {
+        return await _context.BookIssues
+            .CountAsync(bi => bi.MemberId == memberId && bi.Status == "Issued");
+    }
+
+    private async Task<int> GetTotalIssueCount(int memberId)
+    {
+        return await _context.BookIssues
+            .CountAsync(bi => bi.MemberId == memberId);
+    }
+
+    private async Task<List<BookIssue>> GetCurrentIssues(int memberId)
+    {
+        return await _context.BookIssues
+            .Where(bi => bi.MemberId == memberId && bi.Status == "Issued")
+            .Include(bi => bi.Book)
+                .ThenInclude(b => b.Author)
+            .OrderByDescending(bi => bi.IssueDate)
+            .ToListAsync();
+    }
+}
+
+@section Scripts {
+    <script>
+        // Double confirmation for delete
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const hasIssues = @currentIssues.Any().ToString().ToLower();
+            if (hasIssues) {
+                e.preventDefault();
+                alert('Cannot delete member with issued books. Please return all books first.');
+                return false;
+            }
+
+            if (!confirm('⚠️ FINAL WARNING: This will permanently delete the member and all their issue history. This action cannot be undone!')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+}
+
+<style>
+    .card-header {
+        border-bottom: none;
+    }
+
+    .alert h6 {
+        margin-bottom: 0.5rem;
+    }
+
+    dl.row dt {
+        font-weight: 600;
+    }
+
+    dl.row dd {
+        margin-bottom: 0.5rem;
+    }
+
+    .badge {
+        font-size: 0.75em;
+        padding: 0.4em 0.6em;
+    }
+
+    .table th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>

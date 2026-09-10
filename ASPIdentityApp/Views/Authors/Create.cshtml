@@ -1,0 +1,110 @@
+﻿@model ASPIdentityApp.Models.Author
+@{
+    ViewData["Title"] = "Add New Author";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-plus me-2"></i>Add New Author</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <!-- Change to show ALL validation errors -->
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="FirstName" class="control-label"></label>
+                                    <input asp-for="FirstName" class="form-control" />
+                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="LastName" class="control-label"></label>
+                                    <input asp-for="LastName" class="form-control" />
+                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Email" class="control-label"></label>
+                                    <input asp-for="Email" class="form-control" type="email" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="DateOfBirth" class="control-label"></label>
+                                    <input asp-for="DateOfBirth" class="form-control" type="date" id="DateOfBirth" />
+                                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Biography" class="control-label"></label>
+                            <textarea asp-for="Biography" class="form-control" rows="4" placeholder="Enter author biography..."></textarea>
+                            <span asp-validation-for="Biography" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Create
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded - Authors Create');
+
+            // Set default date to 30 years ago
+            const dobInput = document.getElementById('DateOfBirth');
+            if (dobInput && !dobInput.value) {
+                const defaultDate = new Date();
+                defaultDate.setFullYear(defaultDate.getFullYear() - 30);
+                const formattedDate = defaultDate.toISOString().split('T')[0];
+                dobInput.value = formattedDate;
+                console.log('Default date set to:', formattedDate);
+            }
+
+            // Form submission debugging
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    console.log('=== FORM SUBMISSION STARTED ===');
+                    console.log('Form valid:', form.checkValidity());
+
+                    // Log all form values
+                    const formData = new FormData(form);
+                    for (let [key, value] of formData.entries()) {
+                        console.log(key + ': ' + value);
+                    }
+
+                    console.log('=== FORM SUBMISSION COMPLETED ===');
+                });
+            }
+        });
+    </script>
+}

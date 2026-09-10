@@ -1,0 +1,115 @@
+﻿@model ASPIdentityApp.Models.Book
+@{
+    ViewData["Title"] = "Edit Book";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-edit me-2"></i>Edit Book</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Title" class="control-label"></label>
+                                    <input asp-for="Title" class="form-control" />
+                                    <span asp-validation-for="Title" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="ISBN" class="control-label"></label>
+                                    <input asp-for="ISBN" class="form-control" />
+                                    <span asp-validation-for="ISBN" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="AuthorId" class="control-label">Author</label>
+                                    <select asp-for="AuthorId" class="form-control" asp-items="ViewBag.Authors">
+                                        <option value="">-- Select Author --</option>
+                                    </select>
+                                    <span asp-validation-for="AuthorId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="PublisherId" class="control-label">Publisher</label>
+                                    <select asp-for="PublisherId" class="form-control" asp-items="ViewBag.Publishers">
+                                        <option value="">-- Select Publisher --</option>
+                                    </select>
+                                    <span asp-validation-for="PublisherId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="PublishedDate" class="control-label"></label>
+                                    <input asp-for="PublishedDate" class="form-control" type="date" />
+                                    <span asp-validation-for="PublishedDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="TotalCopies" class="control-label">Total Copies</label>
+                                    <input asp-for="TotalCopies" class="form-control" min="1" />
+                                    <span asp-validation-for="TotalCopies" class="text-danger"></span>
+                                    <small class="form-text text-muted">Current available: @Model.AvailableCopies</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Genre" class="control-label"></label>
+                                    <input asp-for="Genre" class="form-control" />
+                                    <span asp-validation-for="Genre" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Description" class="control-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Book Information</h6>
+                            <ul class="mb-0">
+                                <li>Changing total copies will automatically adjust available copies</li>
+                                <li>Available copies cannot be less than 0</li>
+                                <li>Books with available copies can be issued to members</li>
+                            </ul>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Save Changes
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

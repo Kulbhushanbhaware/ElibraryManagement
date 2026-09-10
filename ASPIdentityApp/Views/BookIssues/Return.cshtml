@@ -1,0 +1,228 @@
+﻿@model ASPIdentityApp.Models.BookIssue
+@{
+    ViewData["Title"] = "Return Book";
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4><i class="fas fa-undo me-2"></i>Return Book</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Confirm Book Return</h6>
+                        <p class="mb-0">Please verify the book details before confirming return.</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Book Information</h5>
+                            <dl class="row">
+                                <dt class="col-sm-4">Title:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.Book != null)
+                                    {
+                                        @Model.Book.Title
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Book not found</span>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4">Author:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.Book?.Author != null)
+                                    {
+                                        @Model.Book.Author.FirstName @Model.Book.Author.LastName
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Author not found</span>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4">ISBN:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.Book != null)
+                                    {
+                                        @Model.Book.ISBN
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Issue Details</h5>
+                            <dl class="row">
+                                <dt class="col-sm-4">Member:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.Member != null)
+                                    {
+                                        @Model.Member.FirstName @Model.Member.LastName
+                                    
+                                        <br />
+                                        <small class="text-muted">(@Model.Member.MemberCode)</small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Member not found</span>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4">Issue Date:</dt>
+                                <dd class="col-sm-8">@Model.IssueDate.ToString("MMM dd, yyyy")</dd>
+
+                                <dt class="col-sm-4">Due Date:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="@(Model.DueDate < DateTime.Now ? "text-danger fw-bold" : "")">
+                                        @Model.DueDate.ToString("MMM dd, yyyy")
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-4">Days Overdue:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.DueDate < DateTime.Now)
+                                    {
+                                        var daysOverdue = (DateTime.Now - Model.DueDate).Days;
+                                        <span class="text-danger fw-bold">@daysOverdue days</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-success">0 days</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Fine Calculation -->
+                    @{
+                        var overdueDays = Model.DueDate < DateTime.Now ? (DateTime.Now - Model.DueDate).Days : 0;
+                        var calculatedFine = overdueDays * 5;
+                    }
+
+                    @if (overdueDays > 0)
+                    {
+                        <div class="alert alert-danger mt-3">
+                            <h6><i class="fas fa-money-bill-wave me-2"></i>Overdue Fine</h6>
+                            <p class="mb-1">This book is overdue by <strong>@overdueDays days</strong>.</p>
+                            <p class="mb-1">Fine: $5 per day × @overdueDays days = <strong>$@calculatedFine.ToString("F2")</strong></p>
+                            <p class="mb-0"><strong>Total Fine: $@calculatedFine.ToString("F2")</strong></p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success mt-3">
+                            <h6><i class="fas fa-check-circle me-2"></i>No Fine</h6>
+                            <p class="mb-0">This book is being returned on time. No fine will be charged.</p>
+                        </div>
+                    }
+
+                    <form asp-action="Return" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+
+                        <div class="form-group mb-3">
+                            <label for="fineAmount" class="form-label">Final Fine Amount ($)</label>
+                            <input type="number" step="0.01" class="form-control" id="fineAmount"
+                                   name="fineAmount" value="@calculatedFine.ToString("F2")"
+                                   min="0" max="1000" required>
+                            <small class="form-text text-muted">Adjust the fine amount if necessary (default: $5 per overdue day)</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="returnNotes" class="form-label">Return Notes (Optional)</label>
+                            <textarea class="form-control" id="returnNotes" name="returnNotes" rows="3"
+                                      placeholder="Any notes about the book condition or return...">@Model.Notes</textarea>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirmReturn" required>
+                            <label class="form-check-label" for="confirmReturn">
+                                I confirm that the book has been returned in acceptable condition
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success" id="submitBtn" disabled>
+                                <i class="fas fa-check me-1"></i>Confirm Return
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Enable submit button only when confirmation checkbox is checked
+        document.getElementById('confirmReturn').addEventListener('change', function() {
+            document.getElementById('submitBtn').disabled = !this.checked;
+        });
+
+        // Validate fine amount
+        document.getElementById('fineAmount').addEventListener('input', function() {
+            if (this.value < 0) {
+                this.value = 0;
+            }
+            if (this.value > 1000) {
+                this.value = 1000;
+            }
+        });
+
+        // Show confirmation before submitting
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const fineAmount = parseFloat(document.getElementById('fineAmount').value);
+            if (fineAmount > 0) {
+                if (!confirm(`Are you sure you want to charge $${fineAmount.toFixed(2)} fine?`)) {
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
+}
+
+<style>
+    .card-header {
+        border-bottom: none;
+    }
+
+    .alert h6 {
+        margin-bottom: 0.5rem;
+    }
+
+    dl.row dt {
+        font-weight: 600;
+    }
+
+    dl.row dd {
+        margin-bottom: 0.5rem;
+    }
+
+    .form-check-label {
+        font-weight: 500;
+    }
+
+    #submitBtn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
