@@ -25,16 +25,19 @@ Authentication is implemented using ASP.NET Core Identity, scaffolded into a ded
 
 ## 📂 Project Structure
 
-\`\`\`
-ASPIdentityApp/
-├── Areas/Identity      → Authentication (Login, Register, Logout)
-├── Controllers         → Books, Authors, Publishers, Members, BookIssues
-├── Models              → Book, Author, Publisher, Member, BookIssue
-├── Migrations          → EF Core Code-First Migrations
-├── Views               → Razor views for each module
-└── wwwroot             → Static files (CSS, JS, Images)
-\`\`\`
-
+LibraryManagement/
+├── ASPIdentityApp/          → Main .NET Core Web Application
+│   ├── Areas/Identity       → Authentication (Login, Register, Logout)
+│   ├── Controllers          → Books, Authors, Publishers, Members, BookIssues
+│   ├── Models               → Book, Author, Publisher, Member, BookIssue
+│   ├── Migrations           → EF Core Code-First Migrations
+│   ├── Views                → Razor views for each module
+│   ├── wwwroot              → Static files (CSS, JS, Images)
+│   ├── appsettings.json     → Configuration & Connection Strings
+│   └── Program.cs           → Application Entry Point
+├── .gitignore               → Git Ignore Rules
+├── LibraryManagement.sln    → Visual Studio Solution File
+└── README.md                → Project Documentation
 
 ## ⚙️ Getting Started
 1. Clone the repository
