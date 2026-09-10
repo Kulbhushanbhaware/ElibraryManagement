@@ -25,12 +25,12 @@ Authentication is implemented using ASP.NET Core Identity, scaffolded into a ded
 
 ## 📂 Project Structure
 ASPIdentityApp/
-├── Areas/Identity → Authentication (Login, Register, Logout)
-├── Controllers → Books, Authors, Publishers, Members, BookIssues
-├── Models → Book, Author, Publisher, Member, BookIssue
-├── Migrations → EF Core Code-First Migrations
-├── Views → Razor views for each module
-└── wwwroot → Static files (CSS, JS, Images)
+├── Areas/Identity      → Authentication (Login, Register, Logout)
+├── Controllers         → Books, Authors, Publishers, Members, BookIssues
+├── Models              → Book, Author, Publisher, Member, BookIssue
+├── Migrations          → EF Core Code-First Migrations
+├── Views               → Razor views for each module
+└── wwwroot             → Static files (CSS, JS, Images)
 
 ## ⚙️ Getting Started
 1. Clone the repository
